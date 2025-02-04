@@ -250,7 +250,7 @@ public class WordListWindow : Window
         treeView.AppendColumn("ID", new CellRendererText(), "text", 0);
         treeView.AppendColumn("Слово", new CellRendererText(), "text", 1);
         treeView.AppendColumn("Перевод", new CellRendererText(), "text", 2);
-        treeView.AppendColumn("Транскрипция", new CellRendererText(), "text", 3);
+        treeView.AppendColumn("контекст использования", new CellRendererText(), "text", 3);
         treeView.AppendColumn("Статус", new CellRendererText(), "text", 4);
 
         vbox.PackStart(treeView, true, true, 0);
