@@ -1,7 +1,12 @@
 ﻿using System;
 using Gtk;
 using System.Data.SQLite;
+using Cairo;
+using System.Collections.Generic;
+using Pango;
 
+using CairoCtx = Cairo.Context;
+using GtkCairoHelper = Gtk.CairoHelper;
 public class LanguageLearningApp
 {
     public static void Main()
@@ -80,12 +85,12 @@ public class MainWindow : Window
             command.ExecuteNonQuery();
 
             command.CommandText = @"
-                CREATE TABLE IF NOT EXISTS progress (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    word_id INTEGER NOT NULL,
-                    status TEXT NOT NULL,
-                    FOREIGN KEY (word_id) REFERENCES words (id)
-                )";
+            CREATE TABLE IF NOT EXISTS test_results (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                test_date TEXT NOT NULL,
+                correct_answers INTEGER NOT NULL,
+                total_questions INTEGER NOT NULL
+            )";
             command.ExecuteNonQuery();
         }
     }
@@ -274,11 +279,23 @@ public class TestWindow : Window
         string result = $"Тест завершён!\nПравильных ответов: {correctAnswers} из {totalQuestions}";
         ShowMessage("Результаты", result, MessageType.Info);
 
+        using (var insertResultCmd = new SQLiteCommand(connection))
+        {
+            insertResultCmd.CommandText = @"
+            INSERT INTO test_results (test_date, correct_answers, total_questions)
+            VALUES (@date, @correct, @total)";
+            insertResultCmd.Parameters.AddWithValue("@date", DateTime.Now.ToString("yyyy-MM-dd"));
+            insertResultCmd.Parameters.AddWithValue("@correct", correctAnswers);
+            insertResultCmd.Parameters.AddWithValue("@total", totalQuestions);
+            insertResultCmd.ExecuteNonQuery();
+        }
+
         answerEntry.IsEditable = false;
         checkButton.Sensitive = false;
         questionLabel.Text = "Выберите направление и начните тест";
         statusLabel.Text = "Правильных ответов: 0/0";
     }
+
 
     private void ShowMessage(string title, string message, MessageType type = MessageType.Info)
     {
@@ -287,6 +304,20 @@ public class TestWindow : Window
             md.Title = title;
             md.Run();
         }
+    }
+}
+
+public class TestResult
+{
+    public string TestDate { get; set; }
+    public int CorrectAnswers { get; set; }
+    public int TotalQuestions { get; set; }
+
+    public TestResult(string testDate, int correctAnswers, int totalQuestions)
+    {
+        TestDate = testDate;
+        CorrectAnswers = correctAnswers;
+        TotalQuestions = totalQuestions;
     }
 }
 
@@ -441,38 +472,114 @@ public class WordListWindow : Window
 public class StatsWindow : Window
 {
     private SQLiteConnection connection;
+    private List<TestResult> testResults;
 
-    public StatsWindow(SQLiteConnection connection) : base("Статистика")
+    public StatsWindow(SQLiteConnection connection) : base("Статистика тестов")
     {
         this.connection = connection;
-        SetDefaultSize(400, 300);
+        SetDefaultSize(500, 400);
         SetPosition(WindowPosition.Center);
         ModifyBg(StateType.Normal, new Gdk.Color(240, 240, 255));
 
-        VBox vbox = new VBox();
+        LoadTestResults();
 
-        var rememberedCount = GetProgressCount("запомнил");
-        var stillLearningCount = GetProgressCount("ещё учу");
+        VBox vbox = new VBox(false, 10);
+        vbox.BorderWidth = 10;
 
-        Label statsLabel = new Label($"Запомнено: {rememberedCount}, Ещё учу: {stillLearningCount}");
-        vbox.PackStart(statsLabel, true, true, 10);
+        DrawingArea drawingArea = new DrawingArea();
+        drawingArea.SetSizeRequest(480, 300);
+        drawingArea.Drawn += OnDrawingAreaDrawn;
+        vbox.PackStart(drawingArea, true, true, 0);
+
+        Label summaryLabel = new Label();
+        if (testResults.Count > 0)
+        {
+            TestResult latest = testResults[testResults.Count - 1];
+            summaryLabel.Text = $"Последний тест: {latest.TestDate} — {latest.CorrectAnswers}/{latest.TotalQuestions}";
+        }
+        else
+        {
+            summaryLabel.Text = "Нет данных по тестам";
+        }
+        vbox.PackStart(summaryLabel, false, false, 5);
 
         Button backButton = new Button("Назад");
         backButton.Clicked += (sender, e) => Destroy();
-        vbox.PackStart(backButton, true, true, 10);
+        vbox.PackStart(backButton, false, false, 5);
 
         Add(vbox);
         ShowAll();
-        DeleteEvent += (o, args) => Destroy();
     }
 
-    private int GetProgressCount(string status)
+    private void LoadTestResults()
     {
-        using (var command = new SQLiteCommand(connection))
+        testResults = new List<TestResult>();
+        using (var command = new SQLiteCommand("SELECT test_date, correct_answers, total_questions FROM test_results ORDER BY test_date", connection))
+        using (var reader = command.ExecuteReader())
         {
-            command.CommandText = "SELECT COUNT(*) FROM progress WHERE status = @status";
-            command.Parameters.AddWithValue("@status", status);
-            return Convert.ToInt32(command.ExecuteScalar());
+            while (reader.Read())
+            {
+                string date = reader["test_date"].ToString();
+                int correct = Convert.ToInt32(reader["correct_answers"]);
+                int total = Convert.ToInt32(reader["total_questions"]);
+                testResults.Add(new TestResult(date, correct, total));
+            }
+        }
+    }
+
+    private void OnDrawingAreaDrawn(object o, DrawnArgs args)
+    {
+        CairoCtx cr = args.Cr;
+        DrawingArea area = (DrawingArea)o;
+        int width = area.Allocation.Width;
+        int height = area.Allocation.Height;
+
+        cr.SetSourceRGB(1, 1, 1);
+        cr.Rectangle(0, 0, width, height);
+        cr.Fill();
+
+        if (testResults.Count == 0)
+            return;
+
+        int margin = 40;
+        cr.SetSourceRGB(0, 0, 0);
+        cr.LineWidth = 2;
+
+        cr.MoveTo(margin, margin);
+        cr.LineTo(margin, height - margin);
+        cr.LineTo(width - margin, height - margin);
+        cr.Stroke();
+
+        int numTests = testResults.Count;
+        int availableWidth = width - 2 * margin;
+        int barWidth = availableWidth / (numTests * 2); 
+        int gap = barWidth;
+
+        double maxPercentage = 100.0;
+        double scale = (height - 2 * margin) / maxPercentage;
+
+        Pango.Layout layout = new Pango.Layout(this.CreatePangoContext());
+        layout.FontDescription = Pango.FontDescription.FromString("Sans 10");
+
+        for (int i = 0; i < numTests; i++)
+        {
+            TestResult result = testResults[i];
+            double percentage = (result.TotalQuestions > 0) ? ((double)result.CorrectAnswers / result.TotalQuestions * 100.0) : 0;
+            int barHeight = (int)(percentage * scale);
+            int x = margin + gap + i * (barWidth + gap);
+            int y = height - margin - barHeight;
+
+            cr.SetSourceRGB(0.2, 0.2, 0.8);
+            cr.Rectangle(x, y, barWidth, barHeight);
+            cr.Fill();
+
+            layout.SetText($"{percentage:0}%");
+            cr.MoveTo(x, y - 20);
+            Pango.CairoHelper.ShowLayout(cr, layout);
+
+            layout.SetText(result.TestDate);
+            cr.MoveTo(x, height - margin + 5);
+            Pango.CairoHelper.ShowLayout(cr, layout);
         }
     }
 }
