@@ -8,7 +8,7 @@ open System.Reflection
 
 
 [<assembly: System.Reflection.AssemblyCompanyAttribute("LanguageLearningApp")>]
-[<assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")>]
+[<assembly: System.Reflection.AssemblyConfigurationAttribute("Release")>]
 [<assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")>]
 [<assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1004ac11c9f2a4db187c8588e62124a7108ad2d3")>]
 [<assembly: System.Reflection.AssemblyProductAttribute("LanguageLearningApp")>]

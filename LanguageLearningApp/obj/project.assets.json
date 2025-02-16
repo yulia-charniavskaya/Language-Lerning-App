@@ -1398,19 +1398,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\User\\.nuget\\packages\\": {}
+    "C:\\Users\\glebs\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Учёба\\ПдОС\\LanguageLearningApp\\LanguageLearningApp\\LanguageLearningApp.csproj",
+      "projectUniqueName": "C:\\Users\\glebs\\Language-Lerning-App\\LanguageLearningApp\\LanguageLearningApp.csproj",
       "projectName": "LanguageLearningApp",
-      "projectPath": "D:\\Учёба\\ПдОС\\LanguageLearningApp\\LanguageLearningApp\\LanguageLearningApp.csproj",
-      "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-      "outputPath": "D:\\Учёба\\ПдОС\\LanguageLearningApp\\LanguageLearningApp\\obj\\",
+      "projectPath": "C:\\Users\\glebs\\Language-Lerning-App\\LanguageLearningApp\\LanguageLearningApp.csproj",
+      "packagesPath": "C:\\Users\\glebs\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\glebs\\Language-Lerning-App\\LanguageLearningApp\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\glebs\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -1430,6 +1435,11 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -1461,7 +1471,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
