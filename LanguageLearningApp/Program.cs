@@ -129,15 +129,164 @@ public class CardWindow : Window
 
 public class TestWindow : Window
 {
+    private SQLiteConnection connection;
+    private List<Tuple<string, string>> words = new List<Tuple<string, string>>();
+    private int currentQuestion = 0;
+    private int correctAnswers = 0;
+    private int totalQuestions = 0;
+    private bool isForeignToNative = true;
+
+    private Label questionLabel;
+    private Entry answerEntry;
+    private Label statusLabel;
+    private Button checkButton;
+    private RadioButton rbForeignToNative;
+    private RadioButton rbNativeToForeign;
+
     public TestWindow(SQLiteConnection connection) : base("Тест")
     {
-        SetDefaultSize(300, 200);
+        this.connection = connection;
+        SetDefaultSize(400, 300);
         SetPosition(WindowPosition.Center);
         ModifyBg(StateType.Normal, new Gdk.Color(240, 240, 255));
 
-        Label label = new Label("Тест (в разработке)");
-        Add(label);
+        VBox mainBox = new VBox(false, 10);
+
+        HBox modeBox = new HBox(true, 10);
+        rbForeignToNative = new RadioButton("Иностранный → Родной");
+        rbNativeToForeign = new RadioButton(rbForeignToNative, "Родной → Иностранный");
+        modeBox.PackStart(rbForeignToNative, true, true, 0);
+        modeBox.PackStart(rbNativeToForeign, true, true, 0);
+
+        Button startButton = new Button("Начать тест");
+        startButton.Clicked += OnStartTest;
+
+        questionLabel = new Label("Выберите направление и начните тест");
+        answerEntry = new Entry { IsEditable = false };
+        checkButton = new Button("Проверить") { Sensitive = false };
+        checkButton.Clicked += OnCheckAnswer;
+
+        statusLabel = new Label("Правильных ответов: 0/0");
+
+        Button backButton = new Button("Назад");
+        backButton.Clicked += (sender, e) => Destroy();
+
+        mainBox.PackStart(modeBox, false, false, 5);
+        mainBox.PackStart(startButton, false, false, 5);
+        mainBox.PackStart(questionLabel, true, true, 10);
+        mainBox.PackStart(answerEntry, false, false, 5);
+        mainBox.PackStart(checkButton, false, false, 5);
+        mainBox.PackStart(statusLabel, false, false, 5);
+        mainBox.PackStart(backButton, false, false, 5);
+
+        Add(mainBox);
         ShowAll();
+    }
+
+    private void OnStartTest(object sender, EventArgs e)
+    {
+        words.Clear();
+        using (var cmd = new SQLiteCommand("SELECT word, translation FROM words", connection))
+        using (var reader = cmd.ExecuteReader())
+        {
+            while (reader.Read())
+            {
+                words.Add(Tuple.Create(
+                    reader["word"].ToString(),
+                    reader["translation"].ToString()
+                ));
+            }
+        }
+
+        if (words.Count == 0)
+        {
+            ShowMessage("Ошибка", "В базе нет слов для теста!");
+            Destroy();
+            return;
+        }
+
+        currentQuestion = 0;
+        correctAnswers = 0;
+        totalQuestions = words.Count;
+        isForeignToNative = rbForeignToNative.Active;
+
+        ShuffleWords();
+
+        answerEntry.IsEditable = true;
+        checkButton.Sensitive = true;
+        answerEntry.Text = "";
+
+        ShowNextQuestion();
+    }
+
+    private void ShuffleWords()
+    {
+        Random rng = new Random();
+        int n = words.Count;
+        while (n > 1)
+        {
+            n--;
+            int k = rng.Next(n + 1);
+            var value = words[k];
+            words[k] = words[n];
+            words[n] = value;
+        }
+    }
+
+    private void ShowNextQuestion()
+    {
+        if (currentQuestion >= words.Count)
+        {
+            FinishTest();
+            return;
+        }
+
+        var currentWord = words[currentQuestion];
+        string question = isForeignToNative ? currentWord.Item1 : currentWord.Item2;
+        questionLabel.Text = $"Переведите: {question}";
+        statusLabel.Text = $"Правильных ответов: {correctAnswers}/{totalQuestions}";
+        answerEntry.Text = "";
+        answerEntry.GrabFocus();
+    }
+
+    private void OnCheckAnswer(object sender, EventArgs e)
+    {
+        var correctPair = words[currentQuestion];
+        string correctAnswer = isForeignToNative ? correctPair.Item2 : correctPair.Item1;
+        string userAnswer = answerEntry.Text.Trim();
+
+        if (string.Equals(userAnswer, correctAnswer, StringComparison.OrdinalIgnoreCase))
+        {
+            correctAnswers++;
+            ShowMessage("Правильно!", $"Верный ответ: {correctAnswer}", MessageType.Info);
+        }
+        else
+        {
+            ShowMessage("Неправильно", $"Правильный ответ: {correctAnswer}", MessageType.Error);
+        }
+
+        currentQuestion++;
+        ShowNextQuestion();
+    }
+
+    private void FinishTest()
+    {
+        string result = $"Тест завершён!\nПравильных ответов: {correctAnswers} из {totalQuestions}";
+        ShowMessage("Результаты", result, MessageType.Info);
+
+        answerEntry.IsEditable = false;
+        checkButton.Sensitive = false;
+        questionLabel.Text = "Выберите направление и начните тест";
+        statusLabel.Text = "Правильных ответов: 0/0";
+    }
+
+    private void ShowMessage(string title, string message, MessageType type = MessageType.Info)
+    {
+        using (var md = new MessageDialog(this, DialogFlags.Modal, type, ButtonsType.Ok, message))
+        {
+            md.Title = title;
+            md.Run();
+        }
     }
 }
 
