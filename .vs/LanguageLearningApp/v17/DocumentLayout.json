@@ -1,10 +1,17 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\glebs\\Language-Lerning-App\\",
+  "WorkspaceRootPath": "C:\\Users\\keksc\\source\\repos\\Language-Lerning-App\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{221507CA-168B-4FF0-9108-677CCCB55831}|LanguageLearningApp\\LanguageLearningApp.csproj|c:\\users\\glebs\\language-lerning-app\\languagelearningapp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{221507CA-168B-4FF0-9108-677CCCB55831}|LanguageLearningApp\\LanguageLearningApp.csproj|c:\\users\\keksc\\source\\repos\\language-lerning-app\\languagelearningapp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{221507CA-168B-4FF0-9108-677CCCB55831}|LanguageLearningApp\\LanguageLearningApp.csproj|solutionrelative:languagelearningapp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\keksc\\AppData\\Local\\Temp\\.vsdbgsrc\\5d2cde55cbeddbf4c8cfbd14d8d0a8f37bd84fadf5fc1ec0a51209d4475aeede\\LanguageLearningApp.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{221507CA-168B-4FF0-9108-677CCCB55831}|LanguageLearningApp\\LanguageLearningApp.csproj|c:\\users\\keksc\\source\\repos\\language-lerning-app\\languagelearningapp\\languagelearningapp.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{221507CA-168B-4FF0-9108-677CCCB55831}|LanguageLearningApp\\LanguageLearningApp.csproj|solutionrelative:languagelearningapp\\languagelearningapp.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,7 +21,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -22,13 +29,38 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "LanguageLearningApp.csproj",
+              "DocumentMoniker": "C:\\Users\\keksc\\source\\repos\\Language-Lerning-App\\LanguageLearningApp\\LanguageLearningApp.csproj",
+              "RelativeDocumentMoniker": "LanguageLearningApp\\LanguageLearningApp.csproj",
+              "ToolTip": "C:\\Users\\keksc\\source\\repos\\Language-Lerning-App\\LanguageLearningApp\\LanguageLearningApp.csproj",
+              "RelativeToolTip": "LanguageLearningApp\\LanguageLearningApp.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-02-17T16:27:10.884Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "LanguageLearningApp.cs",
+              "DocumentMoniker": "C:\\Users\\keksc\\AppData\\Local\\Temp\\.vsdbgsrc\\5d2cde55cbeddbf4c8cfbd14d8d0a8f37bd84fadf5fc1ec0a51209d4475aeede\\LanguageLearningApp.cs",
+              "RelativeDocumentMoniker": "..\\..\\..\\AppData\\Local\\Temp\\.vsdbgsrc\\5d2cde55cbeddbf4c8cfbd14d8d0a8f37bd84fadf5fc1ec0a51209d4475aeede\\LanguageLearningApp.cs",
+              "ToolTip": "C:\\Users\\keksc\\AppData\\Local\\Temp\\.vsdbgsrc\\5d2cde55cbeddbf4c8cfbd14d8d0a8f37bd84fadf5fc1ec0a51209d4475aeede\\LanguageLearningApp.cs [\u0422\u043E\u043B\u044C\u043A\u043E \u0447\u0442\u0435\u043D\u0438\u0435]",
+              "RelativeToolTip": "..\\..\\..\\AppData\\Local\\Temp\\.vsdbgsrc\\5d2cde55cbeddbf4c8cfbd14d8d0a8f37bd84fadf5fc1ec0a51209d4475aeede\\LanguageLearningApp.cs [\u0422\u043E\u043B\u044C\u043A\u043E \u0447\u0442\u0435\u043D\u0438\u0435]",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-17T16:23:27.041Z",
+              "EditorCaption": " [\u0422\u043E\u043B\u044C\u043A\u043E \u0447\u0442\u0435\u043D\u0438\u0435]"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\glebs\\Language-Lerning-App\\LanguageLearningApp\\Program.cs",
+              "DocumentMoniker": "C:\\Users\\keksc\\source\\repos\\Language-Lerning-App\\LanguageLearningApp\\Program.cs",
               "RelativeDocumentMoniker": "LanguageLearningApp\\Program.cs",
-              "ToolTip": "C:\\Users\\glebs\\Language-Lerning-App\\LanguageLearningApp\\Program.cs",
+              "ToolTip": "C:\\Users\\keksc\\source\\repos\\Language-Lerning-App\\LanguageLearningApp\\Program.cs",
               "RelativeToolTip": "LanguageLearningApp\\Program.cs",
-              "ViewState": "AgIAADMCAAAAAAAAAAAAABkBAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAJYBAAAAAAAAAAAswDEBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-02-16T15:17:34.862Z",
               "EditorCaption": ""
