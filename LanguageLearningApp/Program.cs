@@ -113,24 +113,197 @@ public class MainWindow : Window
 }
 public class CardWindow : Window
 {
+    private SQLiteConnection connection;
+    private Button createCardButton;
+    private Label cardLabel;
+    private Button swipeLeftButton;
+    private Button swipeRightButton;
+
+    private WordItem currentWord;
+
+    private bool isTranslationShown = false;
+
+    private class WordItem
+    {
+        public int Id { get; set; }
+        public string Word { get; set; }
+        public string Translation { get; set; }
+        public string Transcription { get; set; }
+    }
+
     public CardWindow(SQLiteConnection connection) : base("Карточки")
     {
+        this.connection = connection;
         SetDefaultSize(400, 300);
         SetPosition(WindowPosition.Center);
         ModifyBg(StateType.Normal, new Gdk.Color(240, 240, 255));
 
-        VBox vbox = new VBox();
+        using (var command = new SQLiteCommand(
+            "CREATE TABLE IF NOT EXISTS progress (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            "word_id INTEGER NOT NULL, " +
+            "status TEXT NOT NULL, " +
+            "FOREIGN KEY(word_id) REFERENCES words(id))", connection))
+        {
+            command.ExecuteNonQuery();
+        }
 
-        Label label = new Label("Карточки (в разработке)");
-        vbox.PackStart(label, true, true, 10);
+       
+        VBox mainBox = new VBox(false, 10);
+        mainBox.BorderWidth = 10;
+
+       
+        createCardButton = new Button("Создать карточку");
+        createCardButton.Clicked += OnCreateCardClicked;
+
+     
+        EventBox cardEventBox = new EventBox();
+        cardLabel = new Label("Нажмите 'Создать карточку' для начала.");
+        cardLabel.Wrap = true;
+        cardLabel.Justify = Justification.Center;
+        cardEventBox.Add(cardLabel);
+  
+        cardEventBox.ModifyBg(StateType.Normal, new Gdk.Color(255, 255, 255));
+        cardEventBox.ButtonPressEvent += OnCardClicked;
+
+        HBox swipeBox = new HBox(true, 10);
+        swipeLeftButton = new Button("Выучено");
+        swipeLeftButton.Clicked += OnSwipeLeft;
+        swipeRightButton = new Button("Не выучено");
+        swipeRightButton.Clicked += OnSwipeRight;
+
+        swipeLeftButton.Sensitive = false;
+        swipeRightButton.Sensitive = false;
+        swipeBox.PackStart(swipeLeftButton, true, true, 0);
+        swipeBox.PackStart(swipeRightButton, true, true, 0);
+
         Button backButton = new Button("Назад");
         backButton.Clicked += (sender, e) => Destroy();
-        vbox.PackStart(backButton, false, false, 0);
 
-        Add(vbox);
+        mainBox.PackStart(createCardButton, false, false, 5);
+        mainBox.PackStart(cardEventBox, true, true, 5);
+        mainBox.PackStart(swipeBox, false, false, 5);
+        mainBox.PackStart(backButton, false, false, 5);
+
+        Add(mainBox);
         ShowAll();
     }
+
+    private void OnCreateCardClicked(object sender, EventArgs e)
+    {
+        currentWord = GetRandomWord();
+        if (currentWord == null)
+        {
+            ShowMessage("Информация", "Все слова выучены или в базе нет слов для карточек!");
+            return;
+        }
+        isTranslationShown = false;
+        cardLabel.Text = $"Слово: {currentWord.Word}";
+        swipeLeftButton.Sensitive = true;
+        swipeRightButton.Sensitive = true;
+    }
+
+    private void OnCardClicked(object o, ButtonPressEventArgs args)
+    {
+        if (currentWord != null && !isTranslationShown)
+        {
+            cardLabel.Text = $"Слово: {currentWord.Word}\nПеревод: {currentWord.Translation}";
+            isTranslationShown = true;
+        }
+    }
+
+    private void OnSwipeLeft(object sender, EventArgs e)
+    {
+        if (currentWord == null) return;
+        RecordProgress(currentWord.Id, "выучено");
+        ShowMessage("Карточка", "Карточка отмечена как выученная.");
+        ClearCard();
+    }
+
+    private void OnSwipeRight(object sender, EventArgs e)
+    {
+        if (currentWord == null) return;
+        RecordProgress(currentWord.Id, "не выучено");
+        ShowMessage("Карточка", "Карточка отмечена как не выученная.");
+        ClearCard();
+    }
+
+    private void ClearCard()
+    {
+        currentWord = null;
+        cardLabel.Text = "Нажмите 'Создать карточку' для начала.";
+        swipeLeftButton.Sensitive = false;
+        swipeRightButton.Sensitive = false;
+    }
+
+    private void RecordProgress(int wordId, string status)
+    {
+        using (var command = new SQLiteCommand(
+            "INSERT INTO progress (word_id, status) VALUES (@wordId, @status)", connection))
+        {
+            command.Parameters.AddWithValue("@wordId", wordId);
+            command.Parameters.AddWithValue("@status", status);
+            command.ExecuteNonQuery();
+        }
+    }
+
+    private WordItem GetRandomWord()
+    {
+        List<(WordItem word, int weight)> words = new List<(WordItem, int)>();
+        using (var command = new SQLiteCommand(
+            "SELECT w.id, w.word, w.translation, w.transcription, " +
+            "       (SELECT status FROM progress WHERE word_id = w.id ORDER BY id DESC LIMIT 1) as status " +
+            "FROM words w", connection))
+        using (var reader = command.ExecuteReader())
+        {
+            while (reader.Read())
+            {
+                WordItem wi = new WordItem
+                {
+                    Id = Convert.ToInt32(reader["id"]),
+                    Word = reader["word"].ToString(),
+                    Translation = reader["translation"].ToString(),
+                    Transcription = reader["transcription"].ToString()
+                };
+                string status = reader["status"] != DBNull.Value ? reader["status"].ToString() : "";
+
+                if (status == "выучено")
+                    continue;
+                int weight = (status == "не выучено") ? 3 : 1;
+                words.Add((wi, weight));
+            }
+        }
+        if (words.Count == 0)
+            return null;
+
+        int totalWeight = 0;
+        foreach (var item in words)
+            totalWeight += item.weight;
+
+        Random rnd = new Random();
+        int rndValue = rnd.Next(totalWeight);
+        foreach (var item in words)
+        {
+            if (rndValue < item.weight)
+                return item.word;
+            rndValue -= item.weight;
+        }
+        return words[words.Count - 1].word;
+    }
+
+    private void ShowMessage(string title, string message)
+    {
+        using (MessageDialog md = new MessageDialog(this, DialogFlags.Modal,
+                                                      MessageType.Info, ButtonsType.Ok, message))
+        {
+            md.Title = title;
+            md.Run();
+            md.Destroy();
+        }
+    }
 }
+
+
 
 public class TestWindow : Window
 {

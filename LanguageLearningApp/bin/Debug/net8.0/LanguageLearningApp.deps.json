@@ -9,7 +9,8 @@
       "LanguageLearningApp/1.0.0": {
         "dependencies": {
           "GtkSharp": "3.24.24.95",
-          "System.Data.SQLite": "1.0.119"
+          "System.Data.SQLite": "1.0.119",
+          "System.Data.SQLite.Linq": "1.0.119"
         },
         "runtime": {
           "LanguageLearningApp.dll": {}
@@ -275,6 +276,14 @@
           }
         }
       },
+      "System.Data.SQLite.Linq/1.0.119": {
+        "runtime": {
+          "lib/net46/System.Data.SQLite.Linq.dll": {
+            "assemblyVersion": "1.0.119.0",
+            "fileVersion": "1.0.119.0"
+          }
+        }
+      },
       "System.Drawing.Common/4.7.0": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "3.1.0",
@@ -530,6 +539,13 @@
       "sha512": "sha512-BwwgCSeA80gsxdXtU7IQEBrN9kQXWQrD11hNYOJZbXBBI1C4r7hA4QhBAalO1nzijXikthGRUADIEMI3nlucLA==",
       "path": "system.data.sqlite.ef6/1.0.119",
       "hashPath": "system.data.sqlite.ef6.1.0.119.nupkg.sha512"
+    },
+    "System.Data.SQLite.Linq/1.0.119": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-tkzb9aKEiQd18UW8VS6+vGtrkhcp4mjHg/AAKwNN8u7aWoBswquOnU07016MfTXyBUAR67mepWUhFC8zqNdPnA==",
+      "path": "system.data.sqlite.linq/1.0.119",
+      "hashPath": "system.data.sqlite.linq.1.0.119.nupkg.sha512"
     },
     "System.Drawing.Common/4.7.0": {
       "type": "package",

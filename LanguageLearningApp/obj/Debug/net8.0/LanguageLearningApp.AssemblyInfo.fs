@@ -10,7 +10,7 @@ open System.Reflection
 [<assembly: System.Reflection.AssemblyCompanyAttribute("LanguageLearningApp")>]
 [<assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")>]
 [<assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")>]
-[<assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1004ac11c9f2a4db187c8588e62124a7108ad2d3")>]
+[<assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c229ecc154c127521beb896b36c934f0ea0d3b31")>]
 [<assembly: System.Reflection.AssemblyProductAttribute("LanguageLearningApp")>]
 [<assembly: System.Reflection.AssemblyTitleAttribute("LanguageLearningApp")>]
 [<assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")>]
