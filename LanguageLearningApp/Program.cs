@@ -115,12 +115,12 @@ public class CardWindow : Window
 {
     private SQLiteConnection connection;
     private Button createCardButton;
-    private Label cardLabel;
+    private Label wordContextLabel;
+    private Label translationLabel;
     private Button swipeLeftButton;
     private Button swipeRightButton;
 
     private WordItem currentWord;
-
     private bool isTranslationShown = false;
 
     private class WordItem
@@ -128,6 +128,7 @@ public class CardWindow : Window
         public int Id { get; set; }
         public string Word { get; set; }
         public string Translation { get; set; }
+
         public string Transcription { get; set; }
     }
 
@@ -148,21 +149,31 @@ public class CardWindow : Window
             command.ExecuteNonQuery();
         }
 
-       
         VBox mainBox = new VBox(false, 10);
         mainBox.BorderWidth = 10;
 
-       
         createCardButton = new Button("Создать карточку");
         createCardButton.Clicked += OnCreateCardClicked;
 
-     
         EventBox cardEventBox = new EventBox();
-        cardLabel = new Label("Нажмите 'Создать карточку' для начала.");
-        cardLabel.Wrap = true;
-        cardLabel.Justify = Justification.Center;
-        cardEventBox.Add(cardLabel);
-  
+        VBox cardBox = new VBox(false, 5);
+
+        wordContextLabel = new Label("Нажмите 'Создать карточку' для начала.")
+        {
+            Wrap = true,
+            Justify = Justification.Center
+        };
+
+        translationLabel = new Label("")
+        {
+            Wrap = true,
+            Justify = Justification.Center
+        };
+
+        cardBox.PackStart(wordContextLabel, true, true, 5);
+        cardBox.PackStart(translationLabel, false, false, 5);
+        cardEventBox.Add(cardBox);
+
         cardEventBox.ModifyBg(StateType.Normal, new Gdk.Color(255, 255, 255));
         cardEventBox.ButtonPressEvent += OnCardClicked;
 
@@ -198,7 +209,9 @@ public class CardWindow : Window
             return;
         }
         isTranslationShown = false;
-        cardLabel.Text = $"Слово: {currentWord.Word}";
+
+        wordContextLabel.Text = $"Слово: {currentWord.Word}\nКонтекст использования: {currentWord.Transcription}";
+        translationLabel.Text = "";
         swipeLeftButton.Sensitive = true;
         swipeRightButton.Sensitive = true;
     }
@@ -207,7 +220,7 @@ public class CardWindow : Window
     {
         if (currentWord != null && !isTranslationShown)
         {
-            cardLabel.Text = $"Слово: {currentWord.Word}\nПеревод: {currentWord.Translation}";
+            translationLabel.Text = $"Перевод: {currentWord.Translation}";
             isTranslationShown = true;
         }
     }
@@ -231,7 +244,8 @@ public class CardWindow : Window
     private void ClearCard()
     {
         currentWord = null;
-        cardLabel.Text = "Нажмите 'Создать карточку' для начала.";
+        wordContextLabel.Text = "Нажмите 'Создать карточку' для начала.";
+        translationLabel.Text = "";
         swipeLeftButton.Sensitive = false;
         swipeRightButton.Sensitive = false;
     }
@@ -263,10 +277,9 @@ public class CardWindow : Window
                     Id = Convert.ToInt32(reader["id"]),
                     Word = reader["word"].ToString(),
                     Translation = reader["translation"].ToString(),
-                    Transcription = reader["transcription"].ToString()
+                    Transcription = reader["transcription"].ToString() 
                 };
                 string status = reader["status"] != DBNull.Value ? reader["status"].ToString() : "";
-
                 if (status == "выучено")
                     continue;
                 int weight = (status == "не выучено") ? 3 : 1;
@@ -302,6 +315,8 @@ public class CardWindow : Window
         }
     }
 }
+
+
 
 
 
